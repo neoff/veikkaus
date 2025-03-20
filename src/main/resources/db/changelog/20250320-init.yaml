@@ -1,0 +1,81 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20250320-1-create-player-table
+      author: en.varg@gmail.com
+      changes:
+        - createTable:
+            tableName: player
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: balance
+                  type: DECIMAL(15,2)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 20250320-2-create-event-table
+      author: en.varg@gmail.com
+      changes:
+        - createTable:
+            tableName: event
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: timestamp
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: event_type
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: DECIMAL(15,2)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 20250320-3-create-player_event-table
+      author: en.varg@gmail.com
+      changes:
+        - createTable:
+            tableName: player_event
+            columns:
+              - column:
+                  name: player_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_player_event_player
+                    references: player(id)
+              - column:
+                  name: event_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_player_event_event
+                    references: event(id)
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false

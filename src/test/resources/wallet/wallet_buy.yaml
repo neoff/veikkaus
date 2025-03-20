@@ -1,0 +1,19 @@
+name: "Purchase event - Successful charge"
+description: "Should deduct the correct amount from player's wallet when purchasing a game"
+request:
+  method: "PATCH"
+  url: "/wallet"
+  body:
+    eventId: "234e4567-e89b-12d3-a456-426614174111"
+    playerId: "777e6543-e21b-45d3-b123-426614174999"
+    type: "purchase"
+    amount: 50.00
+  headers:
+    Content-Type: "application/json"
+response:
+  status: 201
+  body:
+    playerId: "777e6543-e21b-45d3-b123-426614174999"
+    balance: 0
+  headers:
+    Content-Type: "application/json"

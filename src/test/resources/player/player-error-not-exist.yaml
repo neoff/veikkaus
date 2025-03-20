@@ -1,0 +1,13 @@
+#- name: "Request with not existing player id"
+#  description: "Should return 404 when player is not found"
+#  request:
+#    method: "GET"
+#    url: "/player/unknown-player-id"
+#    headers:
+#      Content-Type: "application/json"
+#  response:
+#    status: 404
+#    body:
+#      error: "Not Found"
+#    headers:
+#      Content-Type: "application/json"
