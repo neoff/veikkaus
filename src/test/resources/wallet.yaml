@@ -1,0 +1,58 @@
+- name: "Purchase event - Successful charge"
+  description: "Should deduct the correct amount from player's wallet when purchasing a game"
+  request:
+    method: "PATCH"
+    url: "/wallet"
+    body:
+      eventId: "234e4567-e89b-12d3-a456-426614174111"
+      playerId: "777e6543-e21b-45d3-b123-426614174999"
+      type: "purchase"
+      amount: 50.00
+    headers:
+      Content-Type: "application/json"
+  response:
+    status: 201
+    body:
+      playerId: "777e6543-e21b-45d3-b123-426614174999"
+      balance: 0
+    headers:
+      Content-Type: "application/json"
+
+- name: "Win event - Successful credit"
+  description: "Should credit player's wallet when a win event occurs"
+  request:
+    method: "PUT"
+    url: "/wallet"
+    body:
+      eventId: "123e4567-e89b-12d3-a456-426614174000"
+      playerId: "987e6543-e21b-45d3-b123-426614174999"
+      type: "win"
+      amount: 150.00
+    headers:
+      Content-Type: "application/json"
+  response:
+    status: 201
+    body:
+      playerId: "987e6543-e21b-45d3-b123-426614174999"
+      balance: 0
+    headers:
+      Content-Type: "application/json"
+
+#- name: "Purchase event - Insufficient funds"
+#  description: "Should return an error when player's balance is insufficient for purchase"
+#  request:
+#    method: "DELETE"
+#    url: "/wallet"
+#    body:
+#      eventId: "345e4567-e89b-12d3-a456-426614174222"
+#      playerId: "555e6543-e21b-45d3-b123-426614174999"
+#      type: "purchase"
+#      amount: 500.00
+#    headers:
+#      Content-Type: "application/json"
+#  response:
+#    status: 400
+#    body:
+#      error: "Insufficient funds"
+#    headers:
+#      Content-Type: "application/json"

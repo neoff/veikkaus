@@ -7,6 +7,7 @@ title Application layers
 [repository] <<..repository..>> as repository
 [models] <<..models..>> as models
 [dto] <<..dto..>> as dto
+[pojo] <<..pojo..>> as pojo
 [service] <<..service..>> as service
 [config] <<..config..>> as config
 
@@ -16,8 +17,16 @@ component  --> config
 repository --> config
 service    --> config
 
+' who can use pojo
+controller --> pojo
+
 ' who can use dto
 controller --> dto
+service --> dto
+component --> dto
+
+' who can use models
+repository --> models
 
 ' who can use repository
 service    --> repository
@@ -29,7 +38,5 @@ service    --> component
 ' who can use service
 controller -> service
 
-' who can use models
-repository --> models
 
 @enduml

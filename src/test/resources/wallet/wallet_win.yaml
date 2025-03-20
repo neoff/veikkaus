@@ -1,0 +1,19 @@
+name: "Win event - Successful credit"
+description: "Should credit player's wallet when a win event occurs"
+request:
+  method: "PUT"
+  url: "/wallet"
+  body:
+    eventId: "123e4567-e89b-12d3-a456-426614174000"
+    playerId: "987e6543-e21b-45d3-b123-426614174999"
+    type: "win"
+    amount: 150.00
+  headers:
+    Content-Type: "application/json"
+response:
+  status: 201
+  body:
+    playerId: "987e6543-e21b-45d3-b123-426614174999"
+    balance: 0
+  headers:
+    Content-Type: "application/json"

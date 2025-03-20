@@ -2,7 +2,7 @@ name: "Get player balance"
 description: "Should retrieve the player's balance"
 request:
   method: "GET"
-  url: "/player/{playerId}"
+  url: "/player/11111111-1111-1111-1111-111111111111"
   headers:
     Content-Type: "application/json"
   matchers:

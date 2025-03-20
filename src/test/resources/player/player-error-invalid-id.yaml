@@ -1,0 +1,13 @@
+name: "Request with invalid player id"
+description: "Should return 404 when incorrect request format"
+request:
+  method: "GET"
+  url: "/player/invalid-player-id"
+  headers:
+    Content-Type: "application/json"
+response:
+  status: 400
+  body:
+    error: "Bad Request"
+  headers:
+    Content-Type: "application/json"

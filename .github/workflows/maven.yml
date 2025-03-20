@@ -7,7 +7,7 @@ on:
       - main
 jobs:
   build:
-    runs-on: ubuntu-latest  # Используем последнюю версию Ubuntu
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code

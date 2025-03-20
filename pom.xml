@@ -35,7 +35,7 @@
 
         <mapstruct.version>1.6.3</mapstruct.version>
         <!-- Test -->
-        <archunit.version>0.23.1</archunit.version>
+        <archunit.version>1.4.0</archunit.version>
         <archunit-junit5.version>0.23.1</archunit-junit5.version>
         <!-- Maven plugin -->
         <openapi-style-validator-maven-plugin.version>1.11</openapi-style-validator-maven-plugin.version>
@@ -395,4 +395,40 @@
             </plugin>
         </plugins>
     </build>
+<profiles>
+    <profile>
+        <id>dev</id>
+        <properties>
+            <hibernate-tools-maven-plugin.version>6.6.10.Final</hibernate-tools-maven-plugin.version>
+        </properties>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.hibernate.tool</groupId>
+                    <artifactId>hibernate-tools-maven</artifactId>
+                    <version>${hibernate-tools-maven-plugin.version}</version>
+                    <configuration>
+                        <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
+                        <packageName>${project.groupId}.${project.artifactId}.model</packageName>
+                        <revengFile>${project.basedir}/src/main/resources/hibernate.reveng.xml</revengFile>
+                        <templatePath>${project.basedir}/src/main/resources/templates</templatePath>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>hbm2java</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>hbmtemplate</id>
+                            <goals>
+                                <goal>hbmtemplate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
 </project>

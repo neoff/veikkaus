@@ -1,0 +1,18 @@
+#  name: "Purchase event - Insufficient funds"
+#  description: "Should return an error when player's balance is insufficient for purchase"
+#  request:
+#    method: "DELETE"
+#    url: "/wallet"
+#    body:
+#      eventId: "345e4567-e89b-12d3-a456-426614174222"
+#      playerId: "555e6543-e21b-45d3-b123-426614174999"
+#      type: "purchase"
+#      amount: 500.00
+#    headers:
+#      Content-Type: "application/json"
+#  response:
+#    status: 400
+#    body:
+#      error: "Insufficient funds"
+#    headers:
+#      Content-Type: "application/json"
