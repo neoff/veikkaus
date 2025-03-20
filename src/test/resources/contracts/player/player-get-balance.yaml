@@ -1,0 +1,21 @@
+name: "Get player balance"
+description: "Should retrieve the player's balance"
+request:
+  method: "GET"
+  url: "/player/{playerId}"
+  headers:
+    Content-Type: "application/json"
+  matchers:
+    url:
+      key: playerId
+      regex: "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+response:
+  status: 200
+  body:
+    balance: 0
+  headers:
+    Content-Type: "application/json"
+  matchers:
+    body:
+      - path: $.balance
+        type: by_equality

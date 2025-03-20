@@ -1,0 +1,35 @@
+server:
+  port: ${SERVER_PORT:8081}
+spring:
+  r2dbc:
+    #r2dbc:postgresql:failover
+    url: ${DB_FAILOVER:r2dbc:postgresql://}${DB_NODES:localhost:5432}/${DB_NAME:veikkaus}?prepareThreshold=0&targetServerType=master
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+  liquibase:
+    enabled: true
+    url: jdbc:postgresql://${DB_MASTER_NODE:localhost}:${DB_PORT:5432}/${DB_NAME:veikkaus}?prepareThreshold=0&targetServerType=master
+    password: ${DB_PASSWORD:postgres}
+    user: ${DB_USER:postgres}
+
+
+management:
+  info:
+    git:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    root: info
+    fi.veikkaus.demo.service: DEBUG

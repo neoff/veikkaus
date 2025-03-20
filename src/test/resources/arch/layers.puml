@@ -1,0 +1,35 @@
+@startuml
+
+title Application layers
+
+[controller] <<..controller..>> as controller
+[component] <<..component..>> as component
+[repository] <<..repository..>> as repository
+[models] <<..models..>> as models
+[dto] <<..dto..>> as dto
+[service] <<..service..>> as service
+[config] <<..config..>> as config
+
+' who can use configuration
+controller --> config
+component  --> config
+repository --> config
+service    --> config
+
+' who can use dto
+controller --> dto
+
+' who can use repository
+service    --> repository
+
+' who can use component
+controller --> component
+service    --> component
+
+' who can use service
+controller -> service
+
+' who can use models
+repository --> models
+
+@enduml
