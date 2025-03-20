@@ -30,6 +30,23 @@
         <java.version>21</java.version>
         <spring-cloud.version>2024.0.0</spring-cloud.version>
 
+        <openapi.folder>${project.basedir}/src/main/resources/contracts</openapi.folder>
+        <openapi.contract.file>${openapi.folder}/api.yaml</openapi.contract.file>
+
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <!-- Test -->
+        <archunit.version>0.23.1</archunit.version>
+        <archunit-junit5.version>0.23.1</archunit-junit5.version>
+        <!-- Maven plugin -->
+        <openapi-style-validator-maven-plugin.version>1.11</openapi-style-validator-maven-plugin.version>
+        <openapi-generator-maven-plugin.version>7.11.0</openapi-generator-maven-plugin.version>
+        <springdoc-openapi.version>2.8.5</springdoc-openapi.version>
+        <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+        <checkstyle.version>10.21.2</checkstyle.version>
+        <projectbuild-helper-maven-plugin.version>3.6.0</projectbuild-helper-maven-plugin.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+
     </properties>
     <dependencies>
         <dependency>
@@ -47,6 +64,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -84,6 +105,34 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- Mapper Generation -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-mapstruct-binding</artifactId>
+            <version>${lombok-mapstruct-binding.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <!-- Springdoc OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+            <version>${springdoc-openapi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+            <version>${springdoc-openapi.version}</version>
+        </dependency>
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -102,14 +151,207 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>spring-web-test-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-contract-verifier</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-contract-wiremock</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <version>${archunit-junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit</artifactId>
+            <version>${archunit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${checkstyle.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <consoleOutput>false</consoleOutput>
+                    <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                    <violationSeverity>warning</violationSeverity>
+                    <failOnViolation>false</failOnViolation>
+                    <failsOnError>false</failsOnError>
+                    <configLocation>${project.basedir}/.config/checkstyle/checkstyle.xml</configLocation>
+                    <excludes>**/target/**/*</excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools.openapistylevalidator</groupId>
+                <artifactId>openapi-style-validator-maven-plugin</artifactId>
+                <version>${openapi-style-validator-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>openapi-validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>validate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <inputFile>${openapi.contract.file}</inputFile>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <inputSpec>${openapi.contract.file}</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <addCompileSourceRoot>true</addCompileSourceRoot>
+                            <typeMappings>
+                                <typeMapping>setString=java.util.Set&lt;String&gt;</typeMapping>
+                            </typeMappings>
+                            <enablePostProcessFile>true</enablePostProcessFile>
+                            <includeCollapsedSpecInArtifacts>true</includeCollapsedSpecInArtifacts>
+                            <generateModels>true</generateModels>
+                            <generateModelTests>true</generateModelTests>
+                            <generateApis>true</generateApis>
+                            <generateApiTests>true</generateApiTests>
+                            <configOptions>
+                                <reactive>true</reactive>
+                                <library>spring-boot</library>
+                                <openApiNullable>false</openApiNullable>
+                                <basePackage>${project.groupId}.${project.artifactId}</basePackage>
+                                <apiPackage>${project.groupId}.${project.artifactId}.controller</apiPackage>
+                                <modelPackage>${project.groupId}.${project.artifactId}.pojo</modelPackage>
+                                <invokerPackage>${project.groupId}.${project.artifactId}</invokerPackage>
+                                <swaggerDocketConfig>false</swaggerDocketConfig>
+                                <useOptional>true</useOptional>
+                                <returnSuccessCode>true</returnSuccessCode>
+                                <useTags>true</useTags>
+                                <virtualService>false</virtualService>
+                                <dateLibrary>java8</dateLibrary>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <interfaceOnly>true</interfaceOnly>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useJakartaEe>true</useJakartaEe>
+                            </configOptions>
+                            <additionalProperties>
+                                <library>spring-boot</library>
+                                <useLombok>true</useLombok>
+                                <modelMutable>false</modelMutable>
+                                <dateLibrary>java8</dateLibrary>
+                                <serializableModel>true</serializableModel>
+                            </additionalProperties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/model/**</exclude>
+                        <exclude>**/dto/**</exclude>
+                        <exclude>**/entity/**</exclude>
+                        <exclude>**/config/**</exclude>
+                        <exclude>**/exception/**</exclude>
+                        <exclude>**/actuate/**</exclude>
+                        <exclude>**/mapper/**/*MapperImpl.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${projectbuild-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/src/</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -127,6 +369,19 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-contract-maven-plugin</artifactId>
+                <version>4.2.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <testFramework>JUNIT5</testFramework>
+                    <testMode>WEBTESTCLIENT</testMode>
+                    <baseClassForTests>
+                        ${project.groupId}.${project.artifactId}.contracts.BaseContractVerifierTest
+                    </baseClassForTests>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
@@ -140,5 +395,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -1,0 +1,196 @@
+openapi: 3.1.1
+info:
+  title: "Game Wallet API"
+  description: "API for managing game wallet transactions between game engine and game account. 
+    The API allows game engines to charge a player's account when a game is played and credit winnings when a player wins.
+    Transactions are idempotent, ensuring duplicate requests do not affect balance inconsistencies."
+  version: "1.0.0"
+  contact:
+    name: Evgenii Nesterov
+    email: en.varg@gmail.com
+  license:
+    name: "Proprietary"
+    identifier: "Proprietary"
+
+servers:
+  - url: "http://localhost:8081"
+    description: "Local server"
+  - url: "https://veikkaus.demo.envarg.com"
+    description: "Demo server"
+
+tags:
+  - name: "Wallet"
+    description: "Operations related to transactions"
+  - name: "Player"
+    description: "Operations related to players"
+
+paths:
+  /wallet:
+    patch:
+      summary: "Charge a player's wallet for a game event"
+      description: "Deducts a specified amount from the player's balance when they initiate a game round.
+        If the player's balance is insufficient, an error is returned."
+      tags:
+        - "Wallet"
+      operationId: "chargeGame"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionRequest"
+      responses:
+        "201":
+          description: "Transaction successful, returning updated balance"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletResponse"
+        "400":
+          description: "Insufficient funds or invalid request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Player not found"
+        "500":
+          description: "Internal server error"
+    put:
+      summary: "Credit a win to a player's wallet"
+      description: "Credits a player's account with a specified amount when they win in the game.
+        The balance is updated and returned to the game engine."
+      tags:
+        - "Wallet"
+      operationId: "winGame"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionRequest"
+      responses:
+        "201":
+          description: "Transaction successful, returning updated balance"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletResponse"
+        "400":
+          description: "Invalid request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Player not found"
+        "500":
+          description: "Internal server error"
+  /player:
+    post:
+      summary: "Create new player with start balance"
+      description: "Create new player and retrieves the current balance."
+      tags:
+        - "Player"
+      operationId: "createPlayer"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "Player name."
+                  example: "Evgenii"
+      responses:
+        "201":
+          description: "Player created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletResponse"
+        "500":
+          description: "Internal server error"
+  /player/{playerId}:
+    get:
+      summary: "Get player's balance"
+      description: "Retrieves the current balance of the player."
+      tags:
+        - "Player"
+      operationId: "getPlayerBalance"
+      parameters:
+        - name: "playerId"
+          in: path
+          description: "Unique identifier of the player."
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: "987e6543-e21b-45d3-b123-426614174999"
+      responses:
+        "200":
+          description: "Player balance retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletResponse"
+        "404":
+          description: "Player not found"
+        "500":
+          description: "Internal server error"
+components:
+  schemas:
+    TransactionRequest:
+      type: object
+      required:
+        - eventId
+        - type
+        - amount
+      properties:
+        eventId:
+          type: string
+          format: uuid
+          description: "Unique identifier of the transaction event. Ensures idempotency."
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        playerId:
+          type: string
+          format: uuid
+          description: "Unique identifier of the player."
+          example: "987e6543-e21b-45d3-b123-426614174999"
+        type:
+          type: string
+          enum: [purchase, win]
+          description: "Type of transaction: 'purchase' deducts funds, 'win' credits funds."
+          example: "purchase"
+        amount:
+          type: number
+          format: double
+          description: "Amount to be charged or credited to the player's account."
+          example: 50.00
+    WalletResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Player name."
+          example: "Evgenii"
+        playerId:
+          type: string
+          format: uuid
+          description: "Unique identifier of the player."
+          example: "987e6543-e21b-45d3-b123-426614174999"
+        balance:
+          type: number
+          format: double
+          description: "Updated balance after the transaction."
+          example: 150.00
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: "Error message describing why the request failed."
+          example: "Insufficient funds"

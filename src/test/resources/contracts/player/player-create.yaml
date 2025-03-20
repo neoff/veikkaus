@@ -1,0 +1,22 @@
+name: "Create player account"
+description: "Should create a new player account with an initial balance"
+request:
+  method: "POST"
+  url: "/player"
+  body:
+    name: "Evgenii"
+  headers:
+    Content-Type: "application/json"
+response:
+  status: 201
+  body:
+    playerId:
+      regex: "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    balance: 0
+  headers:
+    Content-Type: "application/json"
+  matchers:
+    body:
+      - path: $.playerId
+        type: by_regex
+        value: "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
