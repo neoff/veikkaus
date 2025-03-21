@@ -63,7 +63,6 @@ public class PlayerServiceImpl implements PlayerService {
                .logEvent(dto.getPlayerId(), dto.getEventId(), eventType, dto.getAmount())
                .flatMap(p -> getPlayer(p.getPlayerId()).flatMap(player -> {
                  
-                 
                  switch (dto.getType()) {
                    case WIN -> player.setBalance(player
                                                      .getBalance()
@@ -71,6 +70,9 @@ public class PlayerServiceImpl implements PlayerService {
                    case PURCHASE -> player.setBalance(player
                                                           .getBalance()
                                                           .subtract(dto.getAmount()));
+                   default -> {
+                     return Mono.error(new InsufficientException());
+                   }
                  }
                  
                  if (player

@@ -15,6 +15,14 @@ or docker compose
 ```shell
 docker-compose up .
 ```
+#### Env variables
+* **DB_NODES** : Database nodes _(default: localhost:5432)_
+* **DB_NAME** : Database name _(default:veikkaus)_
+* **DB_USER** : Database user _(default: postgres)_
+* **DB_PASSWORD** : Database password _(default: postgres)_
+* **DB_MASTER_NODE** : Database master node _(for liquibase migration, default: localhost:5432)_
+* _DB_FAILOVER_ : Database failover _(for multihost, ex: r2dbc:postgresql:failover://)_
+
 #### Features
 * Create and manage player accounts
 * Charge or credit player balances based on game events
