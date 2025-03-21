@@ -145,8 +145,7 @@ components:
     TransactionRequest:
       type: object
       required:
-        - eventId
-        - type
+        - playerId
         - amount
       properties:
         eventId:
@@ -190,6 +189,10 @@ components:
     ErrorResponse:
       type: object
       properties:
+        code:
+          type: integer
+          description: "HTTP status code."
+          example: 400
         error:
           type: string
           description: "Error message describing why the request failed."

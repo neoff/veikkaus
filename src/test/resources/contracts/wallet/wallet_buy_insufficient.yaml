@@ -11,7 +11,7 @@
 #    headers:
 #      Content-Type: "application/json"
 #  response:
-#    status: 400
+#    status: 402
 #    body:
 #      error: "Insufficient funds"
 #    headers:

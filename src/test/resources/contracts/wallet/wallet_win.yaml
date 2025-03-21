@@ -4,8 +4,8 @@ request:
   method: "PUT"
   url: "/wallet"
   body:
-    eventId: "123e4567-e89b-12d3-a456-426614174000"
-    playerId: "987e6543-e21b-45d3-b123-426614174999"
+    #eventId: "123e4567-e89b-12d3-a456-426614174000"
+    playerId: "11111111-1111-1111-1111-111111111111"
     type: "win"
     amount: 150.00
   headers:
@@ -13,7 +13,7 @@ request:
 response:
   status: 201
   body:
-    playerId: "987e6543-e21b-45d3-b123-426614174999"
-    balance: 0
+    playerId: "11111111-1111-1111-1111-111111111111"
+    balance: 150
   headers:
     Content-Type: "application/json"
