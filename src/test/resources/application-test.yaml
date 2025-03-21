@@ -1,14 +1,13 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
+  r2dbc:
+    url: r2dbc:h2:mem://localhost/testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
     username: sa
     password: ""
-    hikari:
-      maximum-pool-size: 1
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: none
   liquibase:
-    enabled: false
+    enabled: true
+    url: jdbc:h2:mem://localhost/testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+
+
+logging:
+  level:
+    liquibase: DEBUG

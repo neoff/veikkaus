@@ -1,27 +1,26 @@
 package fi.veikkaus.demo;
 
-import javax.sql.DataSource;
+import io.restassured.module.webtestclient.RestAssuredWebTestClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
-
-@SpringBootTest(properties = "spring.profiles.active=test",
-                webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"spring.liquibase.enabled=false",
-                                  "spring.datasource.url=jdbc:h2:mem:testdb",
-                                  "spring.datasource.driver-class-name=org.h2.Driver",
-                                  "spring.jpa.hibernate.ddl-auto=none"})
-@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class VeikkausApplicationTests {
-  @MockitoBean
-  private DataSource dataSource;
+  @Autowired
+  private WebTestClient webTestClient;
   
-  @MockitoBean
-  private JdbcTemplate jdbcTemplate;
+  @BeforeEach
+  void setup() {
+    RestAssuredWebTestClient.webTestClient(webTestClient);
+  }
   
   @Test
   void contextLoads() {
